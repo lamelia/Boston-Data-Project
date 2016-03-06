@@ -1,0 +1,204 @@
+---
+title: "488_PA_Proj"
+author: "Lia Amelia"
+date: "September 21, 2015"
+output: pdf_document
+---
+
+1. Page 126, no 15
+(a) 
+```{r}
+library(MASS)
+#SLR crim(y) & zn(x)
+summary(lm.crimzn <- lm(crim~zn,Boston))
+plot(lm.crimzn)
+#SLR crim(y) & indus(x)
+summary(lm.crimind <- lm(crim~indus,Boston))
+plot(lm.crimind)
+#SLR crim(y) & nox(x)
+summary(lm.crimnox <- lm(crim~nox,Boston))
+plot(lm.crimnox)
+#SLR crim(y) & rm(x)
+summary(lm.crimrm <- lm(crim~rm,Boston))
+plot(lm.crimrm)
+#SLR crim(y) & age(x)
+summary(lm.crimage <- lm(crim~age,Boston))
+plot(lm.crimage)
+#SLR crim(y) & dis(x)
+summary(lm.crimdis <- lm(crim~dis,Boston))
+plot(lm.crimdis)
+#SLR crim(y) & rad(x)
+summary(lm.crimrad <- lm(crim~rad,Boston))
+plot(lm.crimrad)
+#SLR crim(y) & tax(x)
+summary(lm.crimtax <- lm(crim~tax,Boston))
+plot(lm.crimtax)
+#SLR crim(y) & ptratio(x)
+summary(lm.crimpt <- lm(crim~ptratio,Boston))
+plot(lm.crimpt)
+#SLR crim(y) & black(x)
+summary(lm.crimbla <- lm(crim~black,Boston))
+plot(lm.crimbla)
+#SLR crim(y) & lstat(x)
+summary(lm.crimls <- lm(crim~lstat,Boston))
+plot(lm.crimls)
+#SLR crim(y) & medv(x)
+summary(lm.crimmedv <- lm(crim~medv,Boston))
+plot(lm.crimmedv)
+#SLR crim(y) & chas(x)
+#factor variable chas
+Boston$chas <- factor(Boston$chas)
+summary(Boston$chas)
+levels(Boston$chas) <- c(0,1)
+summary(lm.crimchas <- lm(crim~chas,Boston))
+plot(lm.crimchas)
+```
+Simple linear regression models for every predictors show there is association between predictors and crime rate by town except for predictor $chas$, which p-value is higher than 0.05. 
+
+(b)
+```{r}
+#multiple regression model
+summary(lm.crim <- lm(crim~zn+indus+chas+nox+rm+age+dis+rad+tax+ptratio+black+lstat+medv, Boston))
+```
+The result of multiple regression model is different with simple linear regression model for each predictors. Some predictors that are significant for simple linear regression model appear to be not significant in multiple regression model. Predictors that are significantly different from 0 for multiple regression model with ${\alpha}=0.05$ are $zn$, $dis$, $rad$, $black$, and $medv$. 
+
+(c)
+```{r}
+#print all slope of every SLR model
+x_crime <- c(lm.crimzn$coefficients[2],
+             lm.crimind$coefficients[2],
+             lm.crimchas$coefficients[2], 
+             lm.crimnox$coefficients[2],     
+             lm.crimrm$coefficients[2], 
+             lm.crimage$coefficients[2], 
+             lm.crimdis$coefficients[2], 
+             lm.crimrad$coefficients[2], 
+             lm.crimtax$coefficients[2], 
+             lm.crimpt$coefficients[2], 
+             lm.crimbla$coefficients[2], 
+             lm.crimls$coefficients[2], 
+             lm.crimmedv$coefficients[2])
+
+#print all slopes from multiple regression model
+y_crime <- lm.crim$coefficients[2:14]
+
+#create data fram for x_crime and y_crime
+xy_crime <- data.frame(x_crime, y_crime)
+
+#plot x_crime and y_crime
+plot(xy_crime)
+
+```
+
+(d)
+```{r}
+#nonlinear crim(y) & zn(x)
+summary(lm.noncrimzn <- lm(crim~poly(zn,3),Boston))
+#nonlinear crim(y) & indus(x)
+summary(lm.noncrimind <- lm(crim~poly(indus,3),Boston))
+#nonlinear crim(y) & nox(x)
+summary(lm.noncrimnox <- lm(crim~poly(nox,3),Boston))
+#nonlinear crim(y) & rm(x)
+summary(lm.noncrimrm <- lm(crim~poly(rm,3),Boston))
+#nonlinear crim(y) & age(x)
+summary(lm.noncrimage <- lm(crim~poly(age,3),Boston))
+#nonlinear crim(y) & dis(x)
+summary(lm.noncrimdis <- lm(crim~poly(dis,3),Boston))
+#nonlinear crim(y) & rad(x)
+summary(lm.noncrimrad <- lm(crim~poly(rad,3),Boston))
+#nonlinear crim(y) & tax(x)
+summary(lm.noncrimtax <- lm(crim~poly(tax,3),Boston))
+#nonlinear crim(y) & ptratio(x)
+summary(lm.noncrimpt <- lm(crim~poly(ptratio,3),Boston))
+#nonlinear crim(y) & black(x)
+summary(lm.noncrimbla <- lm(crim~poly(black,3),Boston))
+#nonlinear crim(y) & lstat(x)
+summary(lm.noncrimls <- lm(crim~poly(lstat,3),Boston))
+#nonlinear crim(y) & medv(x)
+summary(lm.noncrimmedv <- lm(crim~poly(medv,3),Boston))
+#nonlinear crim(y) & chas(x)
+#Boston$chas <- factor(Boston$chas)
+#summary(Boston$chas)
+#levels(Boston$chas) <- c(0,1)
+#summary(lm.noncrimchas <- lm(crim~poly(chas,3),Boston))
+```
+
+2. 173
+```{r}
+#Logistic regression
+medianC <- median(Boston$crim) #calculate median
+Boston["medC"] <- NA #create empty column of medC
+Boston$medC <- as.numeric(Boston$crim > medianC) #group crime rate
+
+#create subset train & test
+set.seed(12345)
+random <- sample(1:506, 506, replace = FALSE)
+train <- random[1:253]
+test <- random[254:506]
+Boston.train <- Boston[train,]
+Boston.test <- Boston[test,]
+
+#create a model using train data with logit
+glm.med <- glm(medC~zn+indus+nox+rm+dis+rad+
+          tax+ptratio+black+lstat+medv, Boston,family=binomial, subset=train)
+
+#apply the model from data train to data test
+glm.probs <- predict(glm.med,Boston.test,type="response")
+
+#checking match and mismatch
+glm.pred <- rep(0,253) #create an array of 253 with all 0 in it
+glm.pred[glm.probs > 0.5]=1
+table(glm.pred,Boston.test$medC)
+mean(glm.pred==Boston.test$medC) #match
+mean(glm.pred!=Boston.test$medC) #mismatch
+
+#check which factors are significant
+glm.med1 <- glm(medC~zn+indus+nox+rm+dis+rad+tax+
+            ptratio+black+lstat+medv, Boston,family=binomial)
+summary(glm.med1)
+#generate model with only significant predictors
+glm.med2 <- glm(medC~zn+nox+dis+rad+tax+ptratio+black+lstat, Boston,family=binomial,subset=train)
+glm.probs2 <- predict(glm.med2,Boston.test,type="response")
+glm.pred2 <- rep(0,253)
+glm.pred2[glm.probs2 > 0.5]=1
+table(glm.pred2,Boston.test$medC)
+mean(glm.pred2==Boston.test$medC)
+mean(glm.pred2!=Boston.test$medC)
+
+#LDA
+library(MASS)
+#run lda model using train data
+lda.med <- lda(medC~zn+indus+nox+rm+dis+rad+tax+ptratio+
+black+lstat+medv, Boston,subset=train)
+lda.med
+#applying model generated with train data to test data
+#predict function returns a list of 3(class, posterior,and x)
+lda.pred <- predict(lda.med,Boston.test)
+names(lda.pred)
+lda.class <-lda.pred$class
+#compare number of 0 and 1 b/w prediction with the actual test data
+table(lda.class,Boston.test$medC)
+#calc the mean of matching 0 or 1 b/w prediction w/ test data
+mean(lda.class==Boston.test$medC)
+mean(lda.class!=Boston.test$medC)
+
+#we can try with another predictor, instead of using all predictors 
+#we can try to use some predictors only
+
+#KNN
+library(class)
+#create matrix combination of all predictors for train & test data
+attach(Boston)
+train.X <- cbind(zn,indus,nox,rm,dis,rad,tax,ptratio,black,lstat,
+                 medv)[train,]
+test.X <- cbind(zn,indus,nox,rm,dis,rad,tax,ptratio,black,lstat,
+                medv)[test,]
+train.medC <- medC[train]
+set.seed(1)
+knn.pred <- knn(train.X,test.X,train.medC,k=1)
+table(knn.pred,Boston.test$medC)
+mean(knn.pred==Boston.test$medC)
+```
+
+
+
